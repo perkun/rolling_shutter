@@ -43,12 +43,6 @@ int main(int argc, char *argv[])
         eliminate_rolling_shutter(&star_collection, frame_cfg, camera_cfg);
 
 
-    //     for (int i = 0; i < fixed_stars.num_stars; i++)
-    //     {
-    //         printf("%lf %lf\n", star_collection.stars[i].position.x,
-    //                star_collection.stars[i].position.y);
-    //     }
-
     for (int i = 0; i < fixed_stars.num_stars; i++)
     {
         Vec2 diff;
