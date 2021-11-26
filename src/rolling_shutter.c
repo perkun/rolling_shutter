@@ -26,6 +26,7 @@ typedef struct
 {
 	Vec2 bg_dir;
 	double readout_time;
+	char input_stars_filename[1000];
 } Args;
 
 
@@ -48,8 +49,7 @@ int main(int argc, char *argv[])
     CameraConfig camera_cfg;
     camera_cfg.readout_time = args.readout_time;
 
-    StarCollection star_collection = import_stars(
-        "../data/b210308_223511_1002_GPS_40294.fits_b.fits_xy.txt");
+    StarCollection star_collection = import_stars(args.input_stars_filename);
 
 
     StarCollection fixed_stars =
@@ -146,6 +146,7 @@ void print_help()
 		   "--bg-dir-x VX 		x direction of the background\n"
 		   "--bg-dir-y VY 		y direction of the background\n"
 		   "--readout T 		row readout time\n"
+		   "--input FILENAME	input stars filename\n"
 			);
 }
 
@@ -154,7 +155,7 @@ Args parse_args(int argc, char *argv[])
 {
     Args args;
 
-    if (argc < 7)
+    if (argc < 8)
     {
         print_help();
         exit(0);
@@ -164,10 +165,16 @@ Args parse_args(int argc, char *argv[])
     {
         if (strcmp(argv[i], "--bg-dir-x") == 0)
             args.bg_dir.x = atof(argv[i + 1]);
+
         if (strcmp(argv[i], "--bg-dir-y") == 0)
             args.bg_dir.y = atof(argv[i + 1]);
+
         if (strcmp(argv[i], "--readout") == 0)
             args.readout_time = atof(argv[i + 1]);
+
+        if (strcmp(argv[i], "--input") == 0)
+            sprintf(args.input_stars_filename, "%s", argv[i + 1]);
+
         if (strcmp(argv[i], "--help") == 0)
         {
             print_help();
