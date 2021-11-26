@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 
 #include "Vec2.h"
 #include "Stars.h"
@@ -21,19 +22,31 @@ typedef struct
 } FrameConfig;
 
 
+typedef struct
+{
+	Vec2 bg_dir;
+	double readout_time;
+} Args;
+
+
+void print_help();
+Args parse_args(int argc, char *argv[]);
 StarCollection import_stars(char filename[]);
 StarCollection eliminate_rolling_shutter(const StarCollection *star_collection,
                                const FrameConfig frame_cfg,
                                const CameraConfig camera_cfg);
 
 
+
 int main(int argc, char *argv[])
 {
+	Args args = parse_args(argc, argv);
+
     FrameConfig frame_cfg;
-    frame_cfg.background_direction = construct_vec2(3, 10);
+    frame_cfg.background_direction = args.bg_dir;
 
     CameraConfig camera_cfg;
-    camera_cfg.readout_time = 0.02;
+    camera_cfg.readout_time = args.readout_time;
 
     StarCollection star_collection = import_stars(
         "../data/b210308_223511_1002_GPS_40294.fits_b.fits_xy.txt");
@@ -126,3 +139,41 @@ StarCollection eliminate_rolling_shutter(const StarCollection *star_collection,
 	 return fixed_collection;
 }
 
+
+void print_help()
+{
+	printf("rolling_shutter\n\nOPTIONS:\n"
+		   "--bg-dir-x VX 		x direction of the background\n"
+		   "--bg-dir-y VY 		y direction of the background\n"
+		   "--readout T 		row readout time\n"
+			);
+}
+
+
+Args parse_args(int argc, char *argv[])
+{
+    Args args;
+
+    if (argc < 7)
+    {
+        print_help();
+        exit(0);
+    }
+
+    for (int i = 1; i < argc; i++)
+    {
+        if (strcmp(argv[i], "--bg-dir-x") == 0)
+            args.bg_dir.x = atof(argv[i + 1]);
+        if (strcmp(argv[i], "--bg-dir-y") == 0)
+            args.bg_dir.y = atof(argv[i + 1]);
+        if (strcmp(argv[i], "--readout") == 0)
+            args.readout_time = atof(argv[i + 1]);
+        if (strcmp(argv[i], "--help") == 0)
+        {
+            print_help();
+            exit(0);
+        }
+    }
+
+    return args;
+}
